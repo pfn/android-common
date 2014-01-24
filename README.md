@@ -1,3 +1,5 @@
+Some common scala libs for android
+
 Usage:
 
 `libraryDependencies += "com.hanhuy" %% "android-common" % "0.2-SNAPSHOT"`

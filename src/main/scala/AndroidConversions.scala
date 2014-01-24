@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager
 import android.net.wifi.WifiManager
 import android.accounts.AccountManager
 import android.net.nsd.NsdManager
+import android.media.AudioManager
 
 object AndroidConversions {
   val icsAndNewer =
@@ -29,6 +30,8 @@ object AndroidConversions {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
   val gingerbreadAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
+  val kitkatAndNewer =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
   implicit def toBroadcastReceiver(f: (Context, Intent) => Unit) =
     new BroadcastReceiver() {
@@ -183,6 +186,7 @@ object SystemService {
   implicit val wm = SystemService[WifiManager](WIFI_SERVICE)
   implicit val am = SystemService[AccountManager](ACCOUNT_SERVICE)
   implicit val nd = SystemService[NsdManager](NSD_SERVICE)
+  implicit val au = SystemService[AudioManager](AUDIO_SERVICE)
 }
 
 case class RichRunnable(r: Runnable) {

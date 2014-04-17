@@ -2,11 +2,13 @@ import android.Keys._
 
 android.Plugin.androidBuild
 
+crossScalaVersions += "2.9.2"
+
 name := "android-common"
 
 organization := "com.hanhuy"
 
-version := "0.1-SNAPSHOT"
+version := "0.1"
 
 platformTarget in Android := "android-19"
 
@@ -30,23 +32,15 @@ publishTo := {
 pomIncludeRepository := { _ => false }
 
 pomExtra :=
-  <url>http://jsuereth.com/scala-arm</url>
-  <licenses>
-    <license>
-      <name>BSD-style</name>
-      <url>http://www.opensource.org/licenses/bsd-license.php</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
   <scm>
     <url>git@github.com:jsuereth/scala-arm.git</url>
     <connection>scm:git:git@github.com:jsuereth/scala-arm.git</connection>
   </scm>
   <developers>
     <developer>
-      <id>jsuereth</id>
-      <name>Josh Suereth</name>
-      <url>http://jsuereth.com</url>
+      <id>pfnguyen</id>
+      <name>Perry Nguyen</name>
+      <url>https://github.com/pfn</url>
     </developer>
   </developers>
 

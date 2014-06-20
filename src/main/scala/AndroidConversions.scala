@@ -117,7 +117,7 @@ object AndroidConversions {
   implicit def toIntentFilter(ss: Seq[String]) = {
     val filter = new IntentFilter
     ss foreach filter.addAction
-    ss
+    filter
   }
 
   implicit def toRunnable(f: () => Unit) = new Runnable() { def run() = f() }

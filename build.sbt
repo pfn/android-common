@@ -8,7 +8,7 @@ name := "android-common"
 
 organization := "com.hanhuy"
 
-version := "0.1"
+version := "0.2"
 
 platformTarget in Android := "android-19"
 

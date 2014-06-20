@@ -33,7 +33,7 @@ object AndroidConversions {
   val kitkatAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
-  implicit def toBroadcastReceiver(f: (Context, Intent) => Unit) =
+  implicit def toBroadcastReceiver[A](f: (Context, Intent) => A) =
     new BroadcastReceiver() {
       def onReceive(c: Context, i: Intent) = f(c, i)
     }
@@ -59,8 +59,8 @@ object AndroidConversions {
       def onCheckedChanged(p1: RadioGroup, id: Int) = f(id)
     }
 
-  implicit def toDialogInterfaceOnClickListener(
-      f: (DialogInterface, Int) => Unit) =
+  implicit def toDialogInterfaceOnClickListener[A](
+      f: (DialogInterface, Int) => A) =
     new DialogInterface.OnClickListener() {
       def onClick(d: DialogInterface, id: Int) = f(d, id)
     }
@@ -75,12 +75,12 @@ object AndroidConversions {
       def onDismiss(p1: DialogInterface) = f()
     }
 
-  implicit def toDialogInterfaceOnClickListener1(f: () => Unit) =
+  implicit def toDialogInterfaceOnClickListener1[A](f: () => A) =
     new DialogInterface.OnClickListener() {
       def onClick(d: DialogInterface, id: Int) = f()
     }
 
-  implicit def toDialogInterfaceOnShowListener(f: () => Unit) =
+  implicit def toDialogInterfaceOnShowListener[A](f: () => A) =
     new DialogInterface.OnShowListener() {
       def onShow(d: DialogInterface) = f()
     }
@@ -88,13 +88,6 @@ object AndroidConversions {
   implicit def toAdapterViewOnItemClickListener[A](f: Int => A) =
     new AdapterView.OnItemClickListener() {
       def onItemClick(av: AdapterView[_], v: View, pos: Int, id: Long) = f(pos)
-    }
-
-  implicit def toAdapterViewOnItemClickListener2(
-      f: (Int) => Unit) =
-    new AdapterView.OnItemClickListener() {
-      def onItemClick(av: AdapterView[_], v: View, pos: Int, id: Long) =
-        f(pos)
     }
 
   implicit def toViewOnKeyListener(f: (View, Int, KeyEvent) => Boolean) =
@@ -120,16 +113,16 @@ object AndroidConversions {
     filter
   }
 
-  implicit def toRunnable(f: () => Unit) = new Runnable() { def run() = f() }
+  implicit def toRunnable[A](f: () => A) = new Runnable() { def run() = f() }
 
   def async(r: Runnable) = _threadpool.execute(r)
 
   // ok, param: => T can only be used if called directly, no implicits
   def async[A](f: => A): Unit = async(byNameToRunnable(f))
 
-  def byNameToRunnable(f: => Unit) = new Runnable() { def run() = f }
+  def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
 
-  implicit def toUncaughtExceptionHandler(f: (Thread, Throwable) => Unit) =
+  implicit def toUncaughtExceptionHandler[A](f: (Thread, Throwable) => A) =
     new Thread.UncaughtExceptionHandler {
       override def uncaughtException(t: Thread, e: Throwable) = f(t, e)
     }
@@ -253,7 +246,7 @@ class RichActivity(activity: Activity) extends RichContext(activity) {
 }
 
 case class RichHandler(handler: Handler) {
-  def delayed(delay: Long)(f: => Unit) = handler.postDelayed(
+  def delayed[A](delay: Long)(f: => A) = handler.postDelayed(
     AndroidConversions.byNameToRunnable(f), delay)
 }
 

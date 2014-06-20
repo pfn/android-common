@@ -8,7 +8,7 @@ name := "android-common"
 
 organization := "com.hanhuy"
 
-version := "0.2"
+version := "0.3-SNAPSHOT"
 
 platformTarget in Android := "android-19"
 
@@ -33,8 +33,8 @@ pomIncludeRepository := { _ => false }
 
 pomExtra :=
   <scm>
-    <url>git@github.com:jsuereth/scala-arm.git</url>
-    <connection>scm:git:git@github.com:jsuereth/scala-arm.git</connection>
+    <url>git@github.com:pfn/android-common.git</url>
+    <connection>scm:git:git@github.com:pfn/android-common.git</connection>
   </scm>
   <developers>
     <developer>

@@ -127,9 +127,9 @@ object AndroidConversions {
       override def uncaughtException(t: Thread, e: Throwable) = f(t, e)
     }
 
-  implicit def toString(c: CharSequence) = if (c == null) null else c.toString
+  implicit def charSeqToString(c: CharSequence) = if (c == null) null else c.toString
 
-  implicit def toString(t: TextView): String = t.getText
+  implicit def textViewToString(t: TextView): String = t.getText
 
   implicit def toInt(t: TextView) = {
     val s: String = t.getText

@@ -164,12 +164,10 @@ object AndroidConversions {
   def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
 
   private lazy val SERVICE_CONSTANTS = {
-    val fields = classOf[Context].getDeclaredFields filter { f =>
-      f.getName endsWith "_SERVICE"
+    val fields = classOf[Context].getDeclaredFields filter {
+      _.getName endsWith "_SERVICE"
     }
-    fields map { f =>
-      f.get(null).toString.replaceAll("_", "")
-    } toSeq
+    fields map { _.get(null).toString.replaceAll("_", "") } toSeq
   }
 
   import language.experimental.macros

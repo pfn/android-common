@@ -7,21 +7,17 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.telephony.TelephonyManager
 import android.view.View
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget._
-import android.view.LayoutInflater
 import android.text.{SpannableString, SpannableStringBuilder, Spanned}
 import android.text.style.{StyleSpan, ForegroundColorSpan}
 import android.graphics.Typeface
 import scala.annotation.tailrec
 import android.util.Log
-import android.view.inputmethod.InputMethodManager
-import android.net.wifi.WifiManager
-import android.accounts.AccountManager
 import android.net.nsd.NsdManager
-import android.media.AudioManager
 
 object AndroidConversions {
   val icsAndNewer =
@@ -166,20 +162,42 @@ object AndroidConversions {
     }
   }
   def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
+
+  private lazy val SERVICE_CONSTANTS = {
+    val fields = classOf[Context].getDeclaredFields filter { f =>
+      f.getName endsWith "_SERVICE"
+    }
+    fields map { f =>
+      f.get(null).toString.replaceAll("_", "")
+    } toSeq
+  }
+
+  import language.experimental.macros
+
+  implicit def materializeSystemService[T]: SystemService[T] = macro materializeSystemServiceImpl[T]
+
+  def materializeSystemServiceImpl[T: c.WeakTypeTag](c: reflect.macros.Context): c.Expr[SystemService[T]] = {
+    import c.universe._
+
+    val tpe = weakTypeOf[T]
+    val candidates = SERVICE_CONSTANTS filter (tpe.toString.toLowerCase contains _)
+    val service = ("" /: candidates) { (a, b) =>
+      if (a.size > b.size) a else b
+    }
+
+    c.Expr[SystemService[T]] {
+      q"com.hanhuy.android.common.SystemService[$tpe]($service)"
+    }
+  }
 }
 
 case class SystemService[T](name: String)
 object SystemService {
   import Context._
-  implicit val ls = SystemService[LayoutInflater](LAYOUT_INFLATER_SERVICE)
-  implicit val ns = SystemService[NotificationManager](NOTIFICATION_SERVICE)
-  implicit val cm = SystemService[ClipboardManager](CLIPBOARD_SERVICE)
-  implicit val im = SystemService[InputMethodManager](INPUT_METHOD_SERVICE)
-  implicit val sm = SystemService[SearchManager](SEARCH_SERVICE)
-  implicit val wm = SystemService[WifiManager](WIFI_SERVICE)
-  implicit val am = SystemService[AccountManager](ACCOUNT_SERVICE)
-  implicit val nd = SystemService[NsdManager](NSD_SERVICE)
-  implicit val au = SystemService[AudioManager](AUDIO_SERVICE)
+  implicit val `nsd system service` =
+    SystemService[NsdManager](NSD_SERVICE)
+  implicit val `telephony system service` =
+    SystemService[TelephonyManager](TELEPHONY_SERVICE)
 }
 
 case class RichRunnable(r: Runnable) {

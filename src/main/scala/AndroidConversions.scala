@@ -167,7 +167,10 @@ object AndroidConversions {
     val fields = classOf[Context].getDeclaredFields filter {
       _.getName endsWith "_SERVICE"
     }
-    fields map { _.get(null).toString.replaceAll("_", "") } toSeq
+    fields map { f =>
+      val v = f.get(null).toString
+      v.replaceAll("_", "") -> v
+    } toSeq
   }
 
   import language.experimental.macros
@@ -178,9 +181,9 @@ object AndroidConversions {
     import c.universe._
 
     val tpe = weakTypeOf[T]
-    val candidates = SERVICE_CONSTANTS filter (tpe.toString.toLowerCase contains _)
+    val candidates = SERVICE_CONSTANTS filter (tpe.toString.toLowerCase contains _._1)
     val service = ("" /: candidates) { (a, b) =>
-      if (a.size > b.size) a else b
+      if (a.size > b._2.size) a else b._2
     }
 
     c.Expr[SystemService[T]] {

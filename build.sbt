@@ -4,6 +4,14 @@ android.Plugin.androidBuild
 
 crossScalaVersions += "2.11.2"
 
+manifest in Android := <manifest package="com.hanhuy.android.common">
+  <application/>
+</manifest>
+
+processManifest in Android := file("/")
+
+rGenerator in Android := Nil
+
 name := "android-common"
 
 organization := "com.hanhuy"

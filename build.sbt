@@ -4,6 +4,8 @@ android.Plugin.androidBuild
 
 crossScalaVersions += "2.11.2"
 
+javacOptions in Global ++= "-target" :: "1.7" :: "-source" :: "1.7" :: Nil
+
 manifest in Android := <manifest package="com.hanhuy.android.common">
   <application/>
 </manifest>
@@ -16,9 +18,9 @@ name := "android-common"
 
 organization := "com.hanhuy"
 
-version := "0.3-SNAPSHOT"
+version := "0.5"
 
-platformTarget in Android := "android-19"
+platformTarget in Android := "android-22"
 
 debugIncludesTests in Android := false
 

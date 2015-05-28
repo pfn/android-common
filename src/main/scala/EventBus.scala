@@ -26,9 +26,10 @@ abstract class EventBus {
   private var queue = Seq.empty[WeakReference[EventBus.Handler]]
 
   protected def broadcast(e: BusEvent) = queue foreach { r =>
-    r.get map { h =>
-      if (h.isDefinedAt(e)) if (h(e) == EventBus.Remove) this -= r
-    } getOrElse { this -= r }
+    r.get match {
+      case Some(h) => if (h.isDefinedAt(e)) if (h(e) == EventBus.Remove) this -= r
+      case None => this -= r
+    }
   }
 
   def clear() = queue = Seq.empty

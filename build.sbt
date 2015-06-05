@@ -18,7 +18,7 @@ name := "android-common"
 
 organization := "com.hanhuy"
 
-version := "0.6"
+version := "0.7"
 
 platformTarget in Android := "android-22"
 

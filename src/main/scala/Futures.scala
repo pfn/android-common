@@ -25,7 +25,7 @@ object Futures {
 
   implicit object AsyncThread extends ExecutionContext {
     override def execute(runnable: Runnable) =
-      AndroidConversions._threadpool.execute(runnable)
+      _threadpool.execute(runnable)
     override def reportFailure(cause: Throwable) = Log.w(
       "Futures", cause.getMessage, cause)
   }

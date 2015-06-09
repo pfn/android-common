@@ -2,10 +2,8 @@ Some common scala libs for android
 
 Usage:
 
-`libraryDependencies += "com.hanhuy" %% "android-common" % "0.2-SNAPSHOT"`
+`libraryDependencies += "com.hanhuy.android" %% "scala-common" % "1.0-SNAPSHOT"`
 
-`import com.hanhuy.android.common.AndroidConversions._`
-
-`import com.hanhuy.android.common.UiBus`
+`import com.hanhuy.android.common._`
 
 etc.

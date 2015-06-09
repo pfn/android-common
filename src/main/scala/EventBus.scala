@@ -1,7 +1,5 @@
 package com.hanhuy.android.common
 
-import AndroidConversions._
-
 import android.os.{Handler, Looper}
 
 trait BusEvent

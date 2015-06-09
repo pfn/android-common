@@ -1,8 +1,8 @@
-import android.Keys._
-
 android.Plugin.androidBuild
 
-crossScalaVersions += "2.11.2"
+scalaVersion in Global := "2.11.6"
+
+crossScalaVersions += "2.10.4"
 
 javacOptions in Global ++= "-target" :: "1.7" :: "-source" :: "1.7" :: Nil
 
@@ -10,15 +10,13 @@ manifest in Android := <manifest package="com.hanhuy.android.common">
   <application/>
 </manifest>
 
-processManifest in Android := file("/")
-
 rGenerator in Android := Nil
 
-name := "android-common"
+name := "scala-common"
 
-organization := "com.hanhuy"
+organization := "com.hanhuy.android"
 
-version := "0.7"
+version := "1.0-SNAPSHOT"
 
 platformTarget in Android := "android-22"
 

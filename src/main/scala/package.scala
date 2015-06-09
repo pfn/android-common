@@ -1,12 +1,9 @@
 package com.hanhuy.android
 
 import android.content.{Context, IntentFilter}
-import android.graphics.Typeface
 import android.os.{Looper, Build}
-import android.text.style.{StyleSpan, ForegroundColorSpan}
-import android.text.{SpannableString, SpannableStringBuilder, Spanned}
+import android.text.{SpannableStringBuilder, Spanned}
 
-import scala.annotation.tailrec
 import language.implicitConversions
 import language.postfixOps
 
@@ -85,7 +82,7 @@ package object common {
       context.getSystemService(s.name).asInstanceOf[T]
   }
 
-  implicit class SpannedGenerator(val fmt: String) extends AnyVal {
+  implicit class StringAsSpannedGenerator(val fmt: String) extends AnyVal {
     def formatSpans(items: CharSequence*): Spanned = {
       val builder = new SpannableStringBuilder()
       val idx = fmt indexOf "%"
@@ -93,37 +90,6 @@ package object common {
       SpannedGenerator.formatNext(builder, fmt, 0, idx, items)
 
       builder
-    }
-  }
-  object SpannedGenerator {
-    def span(style: Object, text: CharSequence) = {
-      val s = new SpannableString(text)
-      s.setSpan(style, 0, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
-      s
-    }
-    def textColor(color: Int, text: CharSequence) =
-      span(new ForegroundColorSpan(color), text)
-
-    def bold(text: CharSequence) = span(new StyleSpan(Typeface.BOLD) , text)
-
-    def italics(text: CharSequence) = span(new StyleSpan(Typeface.ITALIC), text)
-
-    val DIGITS = Set('0','1','2','3','4','5','6','7','8','9')
-
-    @tailrec
-    private def formatNext(s: SpannableStringBuilder, fmt: String,
-                           cur: Int, next: Int, items: Seq[CharSequence]) {
-      if (next == -1) {
-        s.append(fmt.substring(cur, fmt.length))
-      } else {
-        s.append(fmt.substring(cur, next))
-        val space = fmt.indexWhere(!SpannedGenerator.DIGITS(_), next + 1)
-        val number = fmt.substring(next + 1,
-          if (space < 0) fmt.length else space).toInt
-        s.append(Option(items(number - 1)) getOrElse "")
-        if (space > 0)
-          formatNext(s, fmt, space, fmt indexOf ("%", space), items)
-      }
     }
   }
 }

@@ -1,5 +1,7 @@
 android.Plugin.androidBuild
 
+buildConfigGenerator in Android := Nil
+
 scalaVersion in Global := "2.11.6"
 
 crossScalaVersions += "2.10.4"
@@ -16,7 +18,7 @@ name := "scala-common"
 
 organization := "com.hanhuy.android"
 
-version := "1.0-SNAPSHOT"
+version := "1.0"
 
 platformTarget in Android := "android-22"
 

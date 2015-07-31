@@ -1,5 +1,7 @@
 android.Plugin.androidBuild
 
+lintEnabled in Android := false
+
 buildConfigGenerator in Android := Nil
 
 scalaVersion in Global := "2.11.6"
@@ -18,7 +20,7 @@ name := "scala-common"
 
 organization := "com.hanhuy.android"
 
-version := "1.0"
+version := "1.1-SNAPSHOT"
 
 platformTarget in Android := "android-22"
 

@@ -11,7 +11,7 @@ import android.util.Log
 import scala.annotation.{tailrec, implicitNotFound}
 
 @implicitNotFound(msg = "Unable to find a system service for $T")
-case class SystemService[T](name: String)
+case class SystemService[T](name: String) extends AnyVal
 object SystemService {
   import Context._
   implicit val `nsd system service` =
@@ -19,7 +19,7 @@ object SystemService {
   implicit val `telephony system service` =
     SystemService[TelephonyManager](TELEPHONY_SERVICE)
 }
-case class Logcat(tag: String) {
+case class Logcat(tag: String) extends AnyVal {
   def d(msg: String)               = Log.d(tag, msg)
   def d(msg: String, e: Throwable) = Log.d(tag, msg, e)
   def d(msg: String, args: Any*)   = Log.d(tag, msg format(args:_*))

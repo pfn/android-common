@@ -78,7 +78,7 @@ package object common {
   }
 
   implicit class ContextWithSystemService(val context: Context) extends AnyVal {
-    def systemService[T](implicit s: SystemService[T]): T =
+    @inline def systemService[T](implicit s: SystemService[T]): T =
       context.getSystemService(s.name).asInstanceOf[T]
   }
 

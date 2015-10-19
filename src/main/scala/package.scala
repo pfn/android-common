@@ -22,14 +22,14 @@ package object common {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
 
 
-  implicit def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
-  implicit def toIntentFilter(ss: Seq[String]): IntentFilter = {
+  @inline implicit def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
+  @inline implicit def toIntentFilter(ss: Seq[String]): IntentFilter = {
     val filter = new IntentFilter
     ss foreach filter.addAction
     filter
   }
 
-  implicit def fn0ToRunnable[A](f: () => A): Runnable = new Runnable() { def run() = f() }
+  @inline implicit def fn0ToRunnable[A](f: () => A): Runnable = new Runnable() { def run() = f() }
 
   private[common] def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
 

@@ -1,20 +1,10 @@
-android.Plugin.androidBuild
-
-lintEnabled in Android := false
-
-buildConfigGenerator in Android := Nil
+android.Plugin.androidBuildJar
 
 scalaVersion in Global := "2.11.6"
 
 crossScalaVersions += "2.10.4"
 
 javacOptions in Global ++= "-target" :: "1.7" :: "-source" :: "1.7" :: Nil
-
-manifest in Android := <manifest package="com.hanhuy.android.common">
-  <application/>
-</manifest>
-
-rGenerator in Android := Nil
 
 name := "scala-common"
 
@@ -23,12 +13,6 @@ organization := "com.hanhuy.android"
 version := "1.1-SNAPSHOT"
 
 platformTarget in Android := "android-22"
-
-debugIncludesTests in Android := false
-
-publishArtifact in (Compile,packageBin) := true
-
-publishArtifact in (Compile,packageSrc) := true
 
 // sonatype publishing options follow
 publishMavenStyle := true

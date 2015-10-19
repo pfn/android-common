@@ -10,7 +10,7 @@ name := "scala-common"
 
 organization := "com.hanhuy.android"
 
-version := "1.1-SNAPSHOT"
+version := "1.1"
 
 platformTarget in Android := "android-22"
 

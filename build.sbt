@@ -12,7 +12,7 @@ organization := "com.hanhuy.android"
 
 sonatypeProfileName := "com.hanhuy"
 
-version := "1.2-SNAPSHOT"
+version := "1.2"
 
 platformTarget in Android := "android-23"
 

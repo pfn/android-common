@@ -1,5 +1,6 @@
 package com.hanhuy.android
 
+import android.annotation.TargetApi
 import android.content.{Context, IntentFilter}
 import android.os.{Looper, Build}
 import android.text.{SpannableStringBuilder, Spanned}
@@ -8,18 +9,26 @@ import language.implicitConversions
 import language.postfixOps
 
 package object common {
+  @TargetApi(4)
   val gingerbreadAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
+  @TargetApi(4)
   val honeycombAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
+  @TargetApi(4)
   val icsAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH
+  @TargetApi(4)
   val jellybeanAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+  @TargetApi(4)
   val kitkatAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+  @TargetApi(4)
   val lollipopAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+  @TargetApi(4)
+  val mAndNewer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
 
   @inline implicit def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
@@ -33,6 +42,7 @@ package object common {
 
   private[common] def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
 
+  @TargetApi(11)
   private[common] lazy val _threadpool = {
     if (honeycombAndNewer) android.os.AsyncTask.THREAD_POOL_EXECUTOR
     else { // basically how THREAD_POOL_EXECUTOR is defined in api11+
@@ -49,7 +59,8 @@ package object common {
         })
     }
   }
-  def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
+  @TargetApi(3)
+  @inline def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
 
   private lazy val SERVICE_CONSTANTS = {
     val fields = classOf[Context].getDeclaredFields filter {
@@ -91,5 +102,9 @@ package object common {
 
       builder
     }
+  }
+
+  implicit class AnyAsOptionExtension[T <: Any](val any: T) extends AnyVal {
+    @inline def ? = Option(any)
   }
 }

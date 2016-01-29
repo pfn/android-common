@@ -12,9 +12,9 @@ organization := "com.hanhuy.android"
 
 sonatypeProfileName := "com.hanhuy"
 
-version := "1.1"
+version := "1.2-SNAPSHOT"
 
-platformTarget in Android := "android-22"
+platformTarget in Android := "android-23"
 
 // sonatype publishing options follow
 publishMavenStyle := true
@@ -47,13 +47,11 @@ licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-licen
 homepage := Some(url("https://github.com/pfn/android-common"))
 
 libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-  case Some((2, 10)) ⇒
-    Seq("org.scalamacros" %% "quasiquotes" % "2.0.1")
-  case _ ⇒
-    Seq()
+  case Some((2, 10)) =>
+    "org.scalamacros" %% "quasiquotes" % "2.0.1" ::
+    compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full) ::
+    Nil
+  case _ => Nil
 })
 
-libraryDependencies ++= Seq(
-  "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-  compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
-)
+libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value

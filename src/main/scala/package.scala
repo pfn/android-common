@@ -1,8 +1,8 @@
 package com.hanhuy.android
 
 import android.annotation.TargetApi
-import android.content.{Context, IntentFilter}
-import android.os.{Looper, Build}
+import android.content.{BroadcastReceiver, Intent, Context, IntentFilter}
+import android.os.{Handler, Looper, Build}
 import android.text.{SpannableStringBuilder, Spanned}
 
 import language.implicitConversions
@@ -17,6 +17,24 @@ package object common {
   final val lollipopAndNewer    = iota.v(Build.VERSION_CODES.LOLLIPOP)
   final val mAndNewer           = iota.v(Build.VERSION_CODES.M)
 
+
+  implicit class ContextWithReceiverOp(val context: Context) extends AnyVal {
+    /** registers a `BroadcastReceiver` with the specified actions, the returned
+      * `BroadcastReceiver` must be unregistered manually
+      */
+    def onBroadcast[A](intentFilter: String*)
+                      (f: (Context, Intent) => A,
+                       permission: String = null,
+                       handler: Handler = null): (BroadcastReceiver,Option[Intent]) = {
+      val receiver = new BroadcastReceiver {
+        override def onReceive(context: Context, intent: Intent) = f(context, intent)
+      }
+      val filter = new IntentFilter
+      intentFilter foreach filter.addAction
+      val result = context.registerReceiver(receiver, filter, permission, handler)
+      (receiver,result.?)
+    }
+  }
 
   @inline implicit final def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
   @inline implicit final def toIntentFilter(ss: Seq[String]): IntentFilter = {

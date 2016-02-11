@@ -4,6 +4,7 @@ import ManagedResource._
 
 import scala.annotation.implicitNotFound
 import scala.reflect.macros.{Context => MacroContext}
+import language.experimental.macros
 
 /**
  * @author pfnguyen
@@ -14,9 +15,15 @@ object ManagedResource {
     def dispose(resource: A): Unit
   }
 
-  import language.experimental.macros
-  implicit def materializeResourceManager[A]: ManagedResource.ResourceManager[A] = macro materializeResourceManagerImpl[A]
+  implicit def materializeResourceManager[A]: ManagedResource.ResourceManager[A] = macro ManagedResourceMacro.materializeResourceManagerImpl[A]
 
+  /** alias for apply() */
+  @inline final def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
+
+  def apply[A : ResourceManager](opener: => A): ManagedResource[A] = ManagedResource(() => opener, List.empty)
+}
+
+private[common] object ManagedResourceMacro {
   def materializeResourceManagerImpl[A : c.WeakTypeTag](c: MacroContext): c.Expr[ManagedResource.ResourceManager[A]] = {
     import c.universe._
     val tp = c.weakTypeOf[A]
@@ -39,11 +46,6 @@ object ManagedResource {
       }
     }
   }
-
-  /** alias for apply() */
-  @inline final def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
-
-  def apply[A : ResourceManager](opener: => A): ManagedResource[A] = ManagedResource(() => opener, List.empty)
 }
 
 case class ManagedResource[+A: ResourceManager](opener: () => A, cleanup: List[() => Unit] = List.empty) {

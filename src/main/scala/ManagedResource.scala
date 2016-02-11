@@ -9,7 +9,7 @@ import scala.reflect.macros.{Context => MacroContext}
  * @author pfnguyen
  */
 object ManagedResource {
-  @implicitNotFound("No ResourceManager found for ${A}, create one manually")
+  @implicitNotFound("Unable to generate a ManagedResource.ResourceManager for ${A}, create one manually")
   trait ResourceManager[A] extends Any {
     def dispose(resource: A): Unit
   }
@@ -41,7 +41,7 @@ object ManagedResource {
   }
 
   /** alias for apply() */
-  @inline def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
+  @inline final def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
 
   def apply[A : ResourceManager](opener: => A): ManagedResource[A] = ManagedResource(() => opener, List.empty)
 }

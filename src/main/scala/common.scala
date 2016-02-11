@@ -1,40 +1,28 @@
 package com.hanhuy.android.common
 
-import android.content.Context
 import android.graphics.Typeface
-import android.net.nsd.NsdManager
-import android.telephony.TelephonyManager
 import android.text.style.{StyleSpan, ForegroundColorSpan}
 import android.text.{SpannableStringBuilder, Spanned, SpannableString}
 import android.util.Log
 
-import scala.annotation.{tailrec, implicitNotFound}
+import scala.annotation.tailrec
 
-@implicitNotFound(msg = "Unable to find a system service for $T")
-case class SystemService[T](name: String) extends AnyVal
-object SystemService {
-  import Context._
-  implicit val `nsd system service` =
-    SystemService[NsdManager](NSD_SERVICE)
-  implicit val `telephony system service` =
-    SystemService[TelephonyManager](TELEPHONY_SERVICE)
-}
 case class Logcat(tag: String) extends AnyVal {
-  @inline def d(msg: String)               = Log.d(tag, msg)
-  @inline def d(msg: String, e: Throwable) = Log.d(tag, msg, e)
-  @inline def d(msg: String, args: Any*)   = Log.d(tag, msg format(args:_*))
-  @inline def v(msg: String)               = Log.v(tag, msg)
-  @inline def v(msg: String, e: Throwable) = Log.v(tag, msg, e)
-  @inline def v(msg: String, args: Any*)   = Log.v(tag, msg format(args:_*))
-  @inline def i(msg: String)               = Log.i(tag, msg)
-  @inline def i(msg: String, e: Throwable) = Log.i(tag, msg, e)
-  @inline def i(msg: String, args: Any*)   = Log.i(tag, msg format(args:_*))
-  @inline def w(msg: String)               = Log.w(tag, msg)
-  @inline def w(msg: String, e: Throwable) = Log.w(tag, msg, e)
-  @inline def w(msg: String, args: Any*)   = Log.w(tag, msg format(args:_*))
-  @inline def e(msg: String)               = Log.e(tag, msg)
-  @inline def e(msg: String, e: Throwable) = Log.e(tag, msg, e)
-  @inline def e(msg: String, args: Any*)   = Log.e(tag, msg format(args:_*))
+  @inline final def d(msg: String)               = Log.d(tag, msg)
+  @inline final def d(msg: String, e: Throwable) = Log.d(tag, msg, e)
+  @inline final def d(msg: String, args: Any*)   = Log.d(tag, msg format(args:_*))
+  @inline final def v(msg: String)               = Log.v(tag, msg)
+  @inline final def v(msg: String, e: Throwable) = Log.v(tag, msg, e)
+  @inline final def v(msg: String, args: Any*)   = Log.v(tag, msg format(args:_*))
+  @inline final def i(msg: String)               = Log.i(tag, msg)
+  @inline final def i(msg: String, e: Throwable) = Log.i(tag, msg, e)
+  @inline final def i(msg: String, args: Any*)   = Log.i(tag, msg format(args:_*))
+  @inline final def w(msg: String)               = Log.w(tag, msg)
+  @inline final def w(msg: String, e: Throwable) = Log.w(tag, msg, e)
+  @inline final def w(msg: String, args: Any*)   = Log.w(tag, msg format(args:_*))
+  @inline final def e(msg: String)               = Log.e(tag, msg)
+  @inline final def e(msg: String, e: Throwable) = Log.e(tag, msg, e)
+  @inline final def e(msg: String, args: Any*)   = Log.e(tag, msg format(args:_*))
 }
 
 object SpannedGenerator {

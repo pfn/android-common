@@ -9,36 +9,23 @@ import language.implicitConversions
 import language.postfixOps
 
 package object common {
-  @TargetApi(4)
-  val gingerbreadAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
-  @TargetApi(4)
-  val honeycombAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
-  @TargetApi(4)
-  val icsAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH
-  @TargetApi(4)
-  val jellybeanAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-  @TargetApi(4)
-  val kitkatAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-  @TargetApi(4)
-  val lollipopAndNewer =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-  @TargetApi(4)
-  val mAndNewer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+  final val gingerbreadAndNewer = iota.v(Build.VERSION_CODES.GINGERBREAD)
+  final val honeycombAndNewer   = iota.v(Build.VERSION_CODES.HONEYCOMB)
+  final val icsAndNewer         = iota.v(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+  final val jellybeanAndNewer   = iota.v(Build.VERSION_CODES.JELLY_BEAN)
+  final val kitkatAndNewer      = iota.v(Build.VERSION_CODES.KITKAT)
+  final val lollipopAndNewer    = iota.v(Build.VERSION_CODES.LOLLIPOP)
+  final val mAndNewer           = iota.v(Build.VERSION_CODES.M)
 
 
-  @inline implicit def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
-  @inline implicit def toIntentFilter(ss: Seq[String]): IntentFilter = {
+  @inline implicit final def toIntentFilter(s: String): IntentFilter = new IntentFilter(s)
+  @inline implicit final def toIntentFilter(ss: Seq[String]): IntentFilter = {
     val filter = new IntentFilter
     ss foreach filter.addAction
     filter
   }
 
-  @inline implicit def fn0ToRunnable[A](f: () => A): Runnable = new Runnable() { def run() = f() }
+  @inline implicit final def fn0ToRunnable[A](f: () => A): Runnable = new Runnable() { def run() = f() }
 
   private[common] def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
 
@@ -60,37 +47,11 @@ package object common {
     }
   }
   @TargetApi(3)
-  @inline def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
-
-  private lazy val SERVICE_CONSTANTS = {
-    val fields = classOf[Context].getDeclaredFields filter {
-      _.getName endsWith "_SERVICE"
-    }
-    fields map { f =>
-      val v = f.get(null).toString
-      v.replaceAll("_", "") -> v
-    } toSeq
-  }
-
-  import language.experimental.macros
-  implicit def materializeSystemService[T]: SystemService[T] = macro materializeSystemServiceImpl[T]
-  def materializeSystemServiceImpl[T: c.WeakTypeTag](c: reflect.macros.Context): c.Expr[SystemService[T]] = {
-    import c.universe._
-
-    val tpe = weakTypeOf[T]
-    val candidates = SERVICE_CONSTANTS filter (tpe.toString.toLowerCase contains _._1)
-    val service = ("" /: candidates) { (a, b) =>
-      if (a.length > b._2.length) a else b._2
-    }
-
-    c.Expr[SystemService[T]] {
-      q"com.hanhuy.android.common.SystemService[$tpe]($service)"
-    }
-  }
+  @inline final def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread
 
   implicit class ContextWithSystemService(val context: Context) extends AnyVal {
-    @inline def systemService[T](implicit s: SystemService[T]): T =
-      context.getSystemService(s.name).asInstanceOf[T]
+    @inline final def systemService[T : iota.SystemService]: T =
+      iota.systemService[T](implicitly[iota.SystemService[T]], context)
   }
 
   implicit class StringAsSpannedGenerator(val fmt: String) extends AnyVal {
@@ -105,6 +66,10 @@ package object common {
   }
 
   implicit class AnyAsOptionExtension[T <: Any](val any: T) extends AnyVal {
-    @inline def ? = Option(any)
+    @inline final def ? = Option(any)
+  }
+
+  implicit class AnyAsIOExtension[T <: Any](val any: T) extends AnyVal {
+    @inline final def ! = iota.IO(any)
   }
 }

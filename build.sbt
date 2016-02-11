@@ -6,6 +6,8 @@ crossScalaVersions += "2.10.4"
 
 javacOptions in Global ++= "-target" :: "1.7" :: "-source" :: "1.7" :: Nil
 
+libraryDependencies += "com.hanhuy.android" %% "iota" % "1.0.1"
+
 name := "scala-common"
 
 organization := "com.hanhuy.android"

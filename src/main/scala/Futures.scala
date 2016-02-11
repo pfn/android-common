@@ -31,24 +31,26 @@ object Futures {
   }
 
   implicit class RichFuturesType(val f: Future.type) extends AnyVal {
-    @inline def main[A](b: => A) = f.apply(b)(MainThread)
+    /** run on the UI thread immediately if on UI thread, otherwise post to UI */
+    @inline final def main[A](b: => A) = f.apply(b)(MainThread)
     // ensure posting at the end of the event queue, rather than
     // running immediately if currently on the main thread
-    @inline def mainEx[A](b: => A) = f.apply(b)(MainThreadEx)
+    /** run on the UI thread asynchronously regardless of current thread */
+    @inline final def mainEx[A](b: => A) = f.apply(b)(MainThreadEx)
   }
 
   implicit class RichFutures[T](val f: Future[T]) extends AnyVal {
     type S[U] = PartialFunction[T,U]
     type F[U] = PartialFunction[Throwable,U]
     type C[U] = Try[T] => U
-    @inline def onSuccessHere[U]  = f.onSuccess( _: S[U])(CurrentThread)
-    @inline def onFailureHere[U]  = f.onFailure( _: F[U])(CurrentThread)
-    @inline def onCompleteHere[U] = f.onComplete(_: C[U])(CurrentThread)
-    @inline def onSuccessMain[U]  = f.onSuccess( _: S[U])(MainThread)
-    @inline def onFailureMain[U]  = f.onFailure( _: F[U])(MainThread)
-    @inline def onCompleteMain[U] = f.onComplete(_: C[U])(MainThread)
+    @inline final def onSuccessHere[U]  = f.onSuccess( _: S[U])(CurrentThread)
+    @inline final def onFailureHere[U]  = f.onFailure( _: F[U])(CurrentThread)
+    @inline final def onCompleteHere[U] = f.onComplete(_: C[U])(CurrentThread)
+    @inline final def onSuccessMain[U]  = f.onSuccess( _: S[U])(MainThread)
+    @inline final def onFailureMain[U]  = f.onFailure( _: F[U])(MainThread)
+    @inline final def onCompleteMain[U] = f.onComplete(_: C[U])(MainThread)
 
-    @inline def ~[A >: T](next: => Future[A]): Future[A] = f.flatMap(_ => next)
+    @inline final def ~[A >: T](next: => Future[A]): Future[A] = f.flatMap(_ => next)
   }
   def traverseO[A, B](o: Option[A])(f: A => Future[B])(implicit ev: ExecutionContext): Future[Option[B]] =
     (o map f).fold(Future.successful(Option.empty[B]))(_.flatMap(x => Future.successful(Some(x)))(ev))

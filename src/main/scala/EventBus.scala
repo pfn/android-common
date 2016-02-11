@@ -11,12 +11,15 @@ object EventBus {
   }
 
   trait RefOwner {
-    implicit val __eventBusRefOwner__ = new Owner
+    final implicit val __eventBusRefOwner__ = new Owner
   }
 
-  // this is terribad -- only EventBus.Remove has any meaning
   type Handler = PartialFunction[BusEvent,Any]
-  object Remove // result object for Handler, if present, remove after exec
+
+  /** result value for `Handler`, returning this removes the handler from
+    * future processing
+    */
+  object Remove
 }
 abstract class EventBus {
   import ref.WeakReference
@@ -30,22 +33,22 @@ abstract class EventBus {
     }
   }
 
-  def clear() = queue = Nil
+  final def clear() = queue = Nil
 
   def send(e: BusEvent) = broadcast(e)
 
   // users of += must have trait EventBus.RefOwner
-  def +=(handler: EventBus.Handler)(implicit owner: EventBus.Owner) {
+  final def +=(handler: EventBus.Handler)(implicit owner: EventBus.Owner) {
     // long-lived objects that use EventBus must purge their owner list
     // keep the handler only for as long as the weak reference is valid
     owner.handlers = handler :: owner.handlers
     queue = new WeakReference(handler) :: queue
   }
 
-  def size = queue.size
+  final def size = queue.size
 
   // don't know the owner to remove it from  :-/
-  private def -=(e: WeakReference[EventBus.Handler]) =
+  private[this] def -=(e: WeakReference[EventBus.Handler]) =
     queue = queue filterNot (_ == e)
 }
 /** an `EventBus` that will only handle events on the UI thread */

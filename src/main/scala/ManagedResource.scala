@@ -1,34 +1,47 @@
 package com.hanhuy.android.common
 
-import java.io.{InputStream, OutputStream}
-
 import ManagedResource._
-import android.database.Cursor
+
+import scala.annotation.implicitNotFound
+import scala.reflect.macros.{Context => MacroContext}
 
 /**
  * @author pfnguyen
  */
 object ManagedResource {
-  trait ResourceManager[-A] {
+  @implicitNotFound("No ResourceManager found for ${A}, create one manually")
+  trait ResourceManager[A] extends Any {
     def dispose(resource: A): Unit
   }
 
-  // cannot use closeable because Cursor does not implement Closeable in 4.0
-  //  implicit val closeableManager = new ResourceManager[java.io.Closeable] {
-  //    override def dispose(resource: Closeable) = resource.close()
-  //  }
-  implicit val inputStreamManager = new ResourceManager[InputStream] {
-    override def dispose(resource: InputStream) = resource.close()
-  }
-  implicit val outputStreamManager = new ResourceManager[OutputStream] {
-    override def dispose(resource: OutputStream) = resource.close()
+  import language.experimental.macros
+  implicit def materializeResourceManager[A]: ManagedResource.ResourceManager[A] = macro materializeResourceManagerImpl[A]
+
+  def materializeResourceManagerImpl[A : c.WeakTypeTag](c: MacroContext): c.Expr[ManagedResource.ResourceManager[A]] = {
+    import c.universe._
+    val tp = c.weakTypeOf[A]
+    val checkNoSymbol: Symbol => util.Try[Symbol] =
+      s => if (s == NoSymbol) util.Failure(new Exception) else util.Success(s)
+    val r = util.Try {
+      tp.member(newTermName("close"))
+    }.flatMap(checkNoSymbol).recover { case x =>
+      tp.member(newTermName("recycle"))
+    }.flatMap(checkNoSymbol).recover { case x =>
+      tp.member(newTermName("dispose"))
+    }.flatMap(checkNoSymbol).getOrElse(
+      c.abort(c.enclosingPosition, s"no recycle/dispose/close method in $tp"))
+
+    val expr = c.Expr(Apply(Select(Ident(newTermName("res")), r), Nil))
+
+    reify {
+      new ResourceManager[A] {
+        override def dispose(res: A) = expr.splice
+      }
+    }
   }
 
-  implicit val cursorCloseManager = new ResourceManager[Cursor] {
-    override def dispose(resource: Cursor) = resource.close()
-  }
-
-  def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
+  /** alias for apply() */
+  @inline def using[A : ResourceManager, B](res: => A) = ManagedResource(res)
 
   def apply[A : ResourceManager](opener: => A): ManagedResource[A] = ManagedResource(() => opener, List.empty)
 }

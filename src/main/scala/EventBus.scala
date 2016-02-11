@@ -7,7 +7,7 @@ trait BusEvent
 object EventBus {
 
   class Owner {
-    var handlers = Seq.empty[EventBus.Handler]
+    var handlers = List.empty[EventBus.Handler]
   }
 
   trait RefOwner {
@@ -21,7 +21,7 @@ object EventBus {
 abstract class EventBus {
   import ref.WeakReference
 
-  private var queue = Seq.empty[WeakReference[EventBus.Handler]]
+  private var queue = List.empty[WeakReference[EventBus.Handler]]
 
   protected def broadcast(e: BusEvent) = queue foreach { r =>
     r.get match {
@@ -30,7 +30,7 @@ abstract class EventBus {
     }
   }
 
-  def clear() = queue = Seq.empty
+  def clear() = queue = Nil
 
   def send(e: BusEvent) = broadcast(e)
 
@@ -38,8 +38,8 @@ abstract class EventBus {
   def +=(handler: EventBus.Handler)(implicit owner: EventBus.Owner) {
     // long-lived objects that use EventBus must purge their owner list
     // keep the handler only for as long as the weak reference is valid
-    owner.handlers = handler +: owner.handlers
-    queue = new WeakReference(handler) +: queue
+    owner.handlers = handler :: owner.handlers
+    queue = new WeakReference(handler) :: queue
   }
 
   def size = queue.size
@@ -48,6 +48,7 @@ abstract class EventBus {
   private def -=(e: WeakReference[EventBus.Handler]) =
     queue = queue filterNot (_ == e)
 }
+/** an `EventBus` that will only handle events on the UI thread */
 object UiBus extends EventBus {
 
   lazy val handler = new Handler(Looper.getMainLooper)
@@ -59,4 +60,6 @@ object UiBus extends EventBus {
   override def send(e: BusEvent) =
     if (isMainThread) broadcast(e) else post { broadcast(e) }
 }
+
+/** an `EventBus` that pays no attention to which thread it's on */
 object ServiceBus extends EventBus

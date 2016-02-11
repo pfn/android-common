@@ -48,7 +48,7 @@ private[common] object ManagedResourceMacro {
   }
 }
 
-case class ManagedResource[+A: ResourceManager](opener: () => A, cleanup: List[() => Unit] = List.empty) {
+case class ManagedResource[A: ResourceManager](opener: () => A, cleanup: List[() => Unit] = List.empty) {
   lazy val res = opener()
   def flatMap[B: ResourceManager](f: A => ManagedResource[B]): ManagedResource[B] = try {
     f(res).copy(cleanup = (() => implicitly[ResourceManager[A]].dispose(res)) :: cleanup)

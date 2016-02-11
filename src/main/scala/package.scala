@@ -29,22 +29,24 @@ package object common {
 
   private[common] def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
 
-  @TargetApi(11)
   private[common] lazy val _threadpool = {
-    if (honeycombAndNewer) android.os.AsyncTask.THREAD_POOL_EXECUTOR
-    else { // basically how THREAD_POOL_EXECUTOR is defined in api11+
-      import java.util.concurrent._
-      import java.util.concurrent.atomic._
-      // initial, max, keep-alive time
-      new ThreadPoolExecutor(5, 128, 1, TimeUnit.SECONDS,
-        new LinkedBlockingQueue[Runnable](10),
-        new ThreadFactory() {
-          val count = new AtomicInteger(1)
-          override def newThread(r: Runnable) =
-            new Thread(r,
-              "AsyncPool #" + count.getAndIncrement)
-        })
-    }
+    @TargetApi(11)
+    def genpool =
+      if (honeycombAndNewer) android.os.AsyncTask.THREAD_POOL_EXECUTOR
+      else { // basically how THREAD_POOL_EXECUTOR is defined in api11+
+        import java.util.concurrent._
+        import java.util.concurrent.atomic._
+        // initial, max, keep-alive time
+        new ThreadPoolExecutor(5, 128, 1, TimeUnit.SECONDS,
+          new LinkedBlockingQueue[Runnable](10),
+          new ThreadFactory() {
+            val count = new AtomicInteger(1)
+            override def newThread(r: Runnable) =
+              new Thread(r,
+                "AsyncPool #" + count.getAndIncrement)
+          })
+      }
+    genpool
   }
   @TargetApi(3)
   @inline final def isMainThread = Looper.getMainLooper.getThread == Thread.currentThread

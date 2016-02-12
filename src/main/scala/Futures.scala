@@ -18,11 +18,6 @@ object Futures {
     override def reportFailure(cause: Throwable) = throw cause
   }
 
-  object MainThreadEx extends ExecutionContext {
-    override def execute(runnable: Runnable) = UiBus.post(runnable.run())
-    override def reportFailure(cause: Throwable) = throw cause
-  }
-
   implicit object AsyncThread extends ExecutionContext {
     override def execute(runnable: Runnable) =
       _threadpool.execute(runnable)
@@ -36,7 +31,7 @@ object Futures {
     // ensure posting at the end of the event queue, rather than
     // running immediately if currently on the main thread
     /** run on the UI thread asynchronously regardless of current thread */
-    @inline final def mainEx[A](b: => A) = f.apply(b)(MainThreadEx)
+    @inline final def mainEx[A](b: => A) = f.apply(b)(iota.std.MainThreadExecutionContext)
   }
 
   implicit class RichFutures[T](val f: Future[T]) extends AnyVal {

@@ -48,12 +48,4 @@ licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-licen
 
 homepage := Some(url("https://github.com/pfn/android-common"))
 
-libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-  case Some((2, 10)) =>
-    "org.scalamacros" %% "quasiquotes" % "2.0.1" ::
-    compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full) ::
-    Nil
-  case _ => Nil
-})
-
 libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value

@@ -14,7 +14,7 @@ organization := "com.hanhuy.android"
 
 sonatypeProfileName := "com.hanhuy"
 
-version := "1.3-SNAPSHOT"
+version := "1.3"
 
 platformTarget in Android := "android-23"
 
